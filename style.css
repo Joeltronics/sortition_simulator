@@ -43,7 +43,7 @@ th {
 #demographics_container {
 	flex-grow: 0;
 	min-width: 200px;
-	max-width: 1000px;
+	max-width: 1200px;
 }
 
 #individuals_container {
@@ -157,4 +157,24 @@ table#individuals_results {
 
 	max-width: 250px;
 	margin: auto;
+}
+
+#pick_many_number {
+	width: 5em;
+}
+
+.probability_number {
+	width: 4em;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button.number_other,
+input::-webkit-inner-spin-button.number_other {
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+/* Firefox */
+input[type=number].number_other {
+	-moz-appearance: textfield;
 }

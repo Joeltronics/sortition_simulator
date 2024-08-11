@@ -1,11 +1,16 @@
 'use strict';
 
 const NUM_DEMOGRAPHICS = 6;
+const MAX_NUM_CATEGORIES = 5;
 
 var demographics = [];
 var num_people = 0;
 
-function make_number(id, min=0, max=100, value=50, step=0.1) {
+function is_empty_or_whitespace(str) {
+	return str === null || str.match(/^ *$/) !== null;
+}
+
+function make_number(id, value=50, min=0, max=100, step=0.1) {
 	let input = document.createElement('input');
 	input.setAttribute('type', 'number');
 
@@ -16,12 +21,6 @@ function make_number(id, min=0, max=100, value=50, step=0.1) {
 	input.setAttribute('max', max);
 	input.setAttribute('value', value);
 	input.setAttribute('step', step);
-
-	let size = 5;
-	if (step < 0.1) {
-		size = 8;
-	}
-	input.setAttribute('size', size);
 
 	return input;
 }
@@ -41,7 +40,70 @@ function make_slider(id, min=0, max=100, value=50, step=0.1) {
 	return input;
 }
 
-function make_demographics_row(idx, name, enabled=true) {
+function set_callbacks(category_probability_inputs, slider=null) {
+
+	if (category_probability_inputs.length == 2) {
+
+		let number_a = category_probability_inputs[0];
+		let number_b = category_probability_inputs[1];
+
+		number_a.addEventListener('change', (event) => {
+			number_b.value = 100 - number_a.value;
+			if (slider) {
+				slider.value = number_a.value;
+			}
+		});
+
+		number_b.addEventListener('change', (event) => {
+			number_a.value = 100 - number_b.value;
+			if (slider) {
+				slider.value = number_a.value;
+			}
+		});
+
+		if (slider) {
+			slider.addEventListener('change', (event) => {
+				let val_a = parseFloat(slider.value);
+				let val_b = 100 - val_a;
+				// Round to 0.1, but remove trailing ".0"
+				number_a.value = parseFloat(val_a.toFixed(1));
+				number_b.value = parseFloat(val_b.toFixed(1));
+			});
+		}
+	} else {
+		// More than 2 - we need an "other" box
+
+		let other_box = category_probability_inputs[category_probability_inputs.length - 1];
+
+		for (let idx = 0; idx < category_probability_inputs.length - 1; ++idx) {
+			let number = category_probability_inputs[idx];
+
+			number.addEventListener('change', (event) => {
+
+				let sum_non_other = 0;
+				for (let n = 0; n < category_probability_inputs.length - 1; ++n) {
+					sum_non_other += parseFloat(category_probability_inputs[n].value);
+				}
+
+				// const other_val = Math.max(0, 100 - sum_non_other);
+				const other_val = 100 - sum_non_other;
+				// TODO: better overflow handling (when other_val < 0)
+
+				for (let n = 0; n < category_probability_inputs.length - 1; ++n) {
+					let input_n = category_probability_inputs[n];
+					const max_val = parseFloat(input_n.value) + Math.max(0, other_val);
+					input_n.setAttribute('max', max_val.toFixed(1));
+				}
+
+				console.log('sum_non_other', sum_non_other, 'other_val', other_val);
+
+				other_box.value = parseFloat(other_val.toFixed(1))
+			});
+		}
+	}
+}
+
+function make_demographics_row(idx, name, num_categories, enabled=true) {
 
 	let tr = document.createElement('tr');
 
@@ -59,67 +121,69 @@ function make_demographics_row(idx, name, enabled=true) {
 	text_category.setAttribute('id', name + '_category_name');
 	text_category.addEventListener('change', (event) => { update_table_head(); })
 
-	let text_a = document.createElement('input');
-	text_a.setAttribute('type', 'text');
-	text_a.setAttribute('size', '10');
-	text_a.setAttribute('value', 'A');
-	text_a.setAttribute('name', name + '_label_a');
-	text_a.setAttribute('id', name + '_label_a');
-	// text_a.addEventListener('change', (event) => { clear_all(); });
+	let category_text_boxes = [];
+	let category_probabilities = [];
+	for (let i = 0; i < num_categories; ++i) {
 
-	let text_b = document.createElement('input');
-	text_b.setAttribute('type', 'text');
-	text_b.setAttribute('size', '10');
-	text_b.setAttribute('value', 'B');
-	text_b.setAttribute('name', name + '_label_b');
-	text_b.setAttribute('id', name + '_label_b');
-	// text_b.addEventListener('change', (event) => { clear_all(); });
+		const is_other = (i == MAX_NUM_CATEGORIES - 1);
+		const default_category_name = is_other ? 'Other' : String.fromCharCode('A'.charCodeAt(0) + i);
+		const default_probability = 100.0 / num_categories;
 
-	let number_a = make_number(name + '_probability_a');
-	let number_b = make_number(name + '_probability_b');
-	let slider = make_slider(name + '_slider');
+		let text = document.createElement('input');
+		text.setAttribute('type', 'text');
+		text.setAttribute('size', '10');
+		text.setAttribute('value', default_category_name);
+		text.setAttribute('name', name + '_label_' + i);
+		text.setAttribute('id', name + '_label_' + i);
+		text.addEventListener('change', (event) => { update_stats(); });
+		category_text_boxes.push(text);
 
-	number_a.addEventListener('change', (event) => {
-		number_b.value = 100 - number_a.value;
-		slider.value = number_a.value;
-	});
-	number_b.addEventListener('change', (event) => {
-		number_a.value = 100 - number_b.value;
-		slider.value = number_a.value;
-	});
-	slider.addEventListener('change', (event) => {
-		let val_a = parseFloat(slider.value);
-		let val_b = 100 - val_a;
-		// Round to 0.1, but remove trailing ".0"
-		number_a.value = parseFloat(val_a.toFixed(1));
-		number_b.value = parseFloat(val_b.toFixed(1));
-	});
+		let number = make_number(name + '_probability_' + i, default_probability);
+		number.classList.add('probability_number');
+		if (is_other) {
+			number.setAttribute('readonly', true);
+			number.classList.add('number_other');
+		} else {
+			number.addEventListener('change', (event) => { update_stats(); });
+		}
+		category_probabilities.push(number);
+	}
+
+	let slider;
+	if (num_categories == 2) {
+		slider = make_slider(name + '_slider');
+	}
+
+	set_callbacks(category_probabilities, slider);
 
 	checkbox.addEventListener('change', (event) => { clear_all(); });
 
-	[
-		[checkbox],
-		[text_category],
-		[text_a, document.createElement('br'), number_a],
-		[slider],
-		[text_b, document.createElement('br'), number_b],
-	].forEach((cell) => {
+	const add_cell = (cell) => {
 		let td = document.createElement('td');
 		cell.forEach((elem) => { td.appendChild(elem);});
 		tr.appendChild(td);
-	});
+		return td;
+	};
 
-	let td;
+	add_cell([checkbox]);
+	add_cell([text_category]);
 
-	td = document.createElement('td');
-	td.id = name + '_results_a';
-	td.classList.add('result_cell');
-	tr.appendChild(td);
+	if (num_categories == 2) {
+		add_cell([category_text_boxes[0], document.createElement('br'), category_probabilities[0]]);
+		add_cell(slider ? [slider] : []).setAttribute('colspan', MAX_NUM_CATEGORIES - 2);
+		add_cell([category_text_boxes[1], document.createElement('br'), category_probabilities[1]]);
+	} else {
+		for (let i = 0; i < num_categories; ++i) {
+			add_cell([category_text_boxes[i], document.createElement('br'), category_probabilities[i]]);
+		}
+	}
 
-	td = document.createElement('td');
-	td.id = name + '_results_b';
-	td.classList.add('result_cell');
-	tr.appendChild(td);
+	for (let i = 0; i < num_categories; ++i) {
+		let td = document.createElement('td');
+		td.id = name + '_results_' + i;
+		td.classList.add('result_cell');
+		tr.appendChild(td);
+	}
 
 	// TODO: pie chart
 	// td = document.createElement('td');
@@ -132,19 +196,23 @@ function make_demographics_row(idx, name, enabled=true) {
 
 function iterate_all_demographics(f) {
 	for (let idx = 0; idx < NUM_DEMOGRAPHICS; ++idx) {
+
+		const num_categories = (idx == 0) ? MAX_NUM_CATEGORIES : 2;
+
 		let name = 'demographic_' + idx;
 		let checkbox = document.getElementById(name + '_enabled');
 		let enabled = undefined;
 		if (checkbox) {
 			enabled = checkbox.checked;
 		}
-		f(idx, name, enabled);
+		f(idx, name, num_categories, enabled);
 	}
 }
+
 function iterate_all_enabled_demographics(f) {
-	iterate_all_demographics((idx, name, enabled) => {
+	iterate_all_demographics((idx, name, num_categories, enabled) => {
 		if (enabled) {
-			f(idx, name);
+			f(idx, name, num_categories);
 		}
 	});
 }
@@ -157,7 +225,7 @@ function update_table_head() {
 	th.innerText = '#';
 	tr.appendChild(th);
 
-	iterate_all_enabled_demographics((idx, name) => {
+	iterate_all_enabled_demographics((idx, name, num_categories) => {
 		let label = document.getElementById(name + '_category_name').value;
 		let th = document.createElement('th');
 		th.innerText = label;
@@ -180,38 +248,59 @@ function reset_table() {
 	console.log('Done clearing table');
 }
 
+function update_stats() {
+	iterate_all_demographics((idx, name, num_categories, enabled) => {
+		for (let i = 0; i < num_categories; ++i) {
+
+			let results = document.getElementById(name + '_results_' + i);
+
+			const label = document.getElementById(name + '_label_' + i).value;
+
+			let this_category_enabled = enabled;
+			if (enabled && num_categories > 2) {
+				const probability = parseFloat(document.getElementById(name + '_probability_' + i).value);
+				if (is_empty_or_whitespace(label) && probability <= 0) {
+					this_category_enabled = false;
+				}
+			}
+
+			if (!this_category_enabled) {
+				results.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
+
+			} else if (num_people <= 0) {
+				// Prevent injection - update as text, then append HTML
+				results.innerText = label;
+				results.innerHTML += '<br>&nbsp;<br>&nbsp;';	
+
+			} else {
+				const val = demographics[idx][i];
+				const pct = val / num_people * 100.0;
+				results.innerText = `${label}\n${val} / ${num_people}\n${pct.toFixed(1)} %`;
+			}
+		}
+	});
+}
+
 function reset_stats() {
 	console.log('reset_stats()');
 
 	num_people = 0;
 	demographics = [];
-	iterate_all_demographics((idx, name, enabled) => {
-		demographics.push([0, 0]);
+	iterate_all_demographics((idx, name, num_categories, enabled) => {
+		let dem = [];
+		for (let i = 0; i < num_categories; ++i) {
+			dem.push(0);
+		}
+		demographics.push(dem);
 	});
 	// console.log(demographics);
 
-	iterate_all_demographics((idx, name, enabled) => {
-		let label_a = document.getElementById(name + '_label_a').value;
-		let label_b = document.getElementById(name + '_label_b').value;
-
-		let results_a = document.getElementById(name + '_results_a');
-		let results_b = document.getElementById(name + '_results_b');
-
-		if (enabled) {
-			results_a.innerText = label_a;
-			results_a.innerHTML += '<br>&nbsp;<br>&nbsp;';
-			results_b.innerText = label_b;
-			results_b.innerHTML += '<br>&nbsp;<br>&nbsp;';
-		} else {
-			results_a.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
-			results_b.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
-		}
-	});
+	update_stats();
 }
 
 function on_ready() {
-	iterate_all_demographics((idx, name, enabled) => {
-		make_demographics_row(idx, name, idx == 0);
+	iterate_all_demographics((idx, name, num_categories, enabled) => {
+		make_demographics_row(idx, name, num_categories, idx <= 1);
 	});
 	reset_stats();
 	reset_table();
@@ -230,6 +319,7 @@ function pick(n) {
 	for (let i = 0; i < n; ++i) {
 		_pick_one();
 	}
+	update_stats();
 }
 
 function _pick_one()
@@ -248,42 +338,61 @@ function _pick_one()
 		tr.appendChild(td);
 	}
 
-	iterate_all_enabled_demographics((idx, name) => {
-		const probability_a = document.getElementById(name + '_probability_a').value / 100.0;
-		// const probability_b = document.getElementById(name + '_probability_b').value / 100.0;
-
-		const label_a = document.getElementById(name + '_label_a').value;
-		const label_b = document.getElementById(name + '_label_b').value;
-		let results_a = document.getElementById(name + '_results_a');
-		let results_b = document.getElementById(name + '_results_b');
+	iterate_all_enabled_demographics((idx, name, num_categories) => {
 
 		let selected_idx;
-		let selected_label;
-		const r = Math.random();
-		if (r < probability_a) {
-			selected_label = label_a;
-			selected_idx = 0;
-		} else {
-			selected_label = label_b;
-			selected_idx = 1;
+		if (num_categories == 2)
+		{
+			const probability_a = document.getElementById(name + '_probability_0').value / 100.0;
+			// const probability_b = document.getElementById(name + '_probability_1').value / 100.0;
+
+			const r = Math.random();
+			if (r < probability_a) {
+				selected_idx = 0;
+			} else {
+				selected_idx = 1;
+			}
+		}
+		else
+		{
+			const r = Math.random();
+
+
+
+
+			// TODO
+
+			let sum_prob = 0;
+			for (let i = 0; i < num_categories; ++i) {
+				const probability_this_category = Math.max(0, document.getElementById(name + '_probability_' + i).value / 100.0);
+				sum_prob += probability_this_category
+
+				if (r < sum_prob) {
+					selected_idx = i;
+					break;
+				}
+			}
+
+
+
+
+
+			// const probability_a = document.getElementById(name + '_probability_0').value / 100.0;
+			// const probability_b = document.getElementById(name + '_probability_1').value / 100.0;
+
+			
+
+			// selected_idx = 0;
+			// selected_label = '';
 		}
 
 		demographics[idx][selected_idx] += 1;
 
 		if (tr) {
 			let td = document.createElement('td');
-			td.innerText = selected_label;
+			td.innerText = document.getElementById(name + '_label_' + selected_idx).value;
 			tr.appendChild(td);
 		}
-
-		const val_a = demographics[idx][0];
-		const val_b = demographics[idx][1];
-
-		const pct_a = val_a / num_people * 100.0;
-		const pct_b = val_b / num_people * 100.0;
-
-		results_a.innerText = `${label_a}\n${val_a} / ${num_people}\n${pct_a.toFixed(1)} %`;
-		results_b.innerText = `${label_b}\n${val_b} / ${num_people}\n${pct_b.toFixed(1)} %`;
 	});
 
 	if (tr) {
