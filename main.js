@@ -41,51 +41,9 @@ function make_slider(id, min=0, max=100, value=50, step=0.1) {
 	return input;
 }
 
-function make_slider_number_box(name, min=0, max=100, value=50, step=0.1) {
-
-	let number = make_number(name + '_probability_b', min, max, value, step);
-	let slider = make_slider(name + '_slider', min, max, value, step);
-
-	number.addEventListener('change', function(event) { slider.value = number.value; });
-	slider.addEventListener('change', function(event) { number.value = slider.value; });
-
-	let slider_number_box = document.createElement('div');
-	slider_number_box.classList.add('slider_number_box')
-
-	slider_number_box.appendChild(slider);
-	slider_number_box.appendChild(document.createElement('br'));
-	slider_number_box.appendChild(number);
-
-	return slider_number_box;
-}
-
-// function make_label_number_box(name, min=0, max=100, value=50, step=0.1) {
-
-// 	let number = make_number(name + '_probability_b', min, max, value, step);
-// 	// let slider = make_slider(name + '_slider', min, max, value, step);
-
-// 	number.addEventListener('change', function(event) { slider.value = number.value; });
-// 	slider.addEventListener('change', function(event) { number.value = slider.value; });
-
-// 	let slider_number_box = document.createElement('div');
-// 	slider_number_box.classList.add('label_number_box')
-
-// 	slider_number_box.appendChild(slider);
-// 	slider_number_box.appendChild(document.createElement('br'));
-// 	slider_number_box.appendChild(number);
-
-// 	return slider_number_box;
-// }
-
 function make_demographics_row(idx, name, enabled=true) {
 
-	// let name = 'demographic_' + idx;
-
-	// let li = document.createElement('li');
-	// li.classList.add('demographic_row');
-
 	let tr = document.createElement('tr');
-	// tr.classList.add('demographic_row');
 
 	let checkbox = document.createElement('input');
 	checkbox.setAttribute('type', 'checkbox');
@@ -117,7 +75,6 @@ function make_demographics_row(idx, name, enabled=true) {
 	text_b.setAttribute('id', name + '_label_b');
 	// text_b.addEventListener('change', (event) => { clear_all(); });
 
-	// let slider_number_box = make_slider_number_box(name);
 	let number_a = make_number(name + '_probability_a');
 	let number_b = make_number(name + '_probability_b');
 	let slider = make_slider(name + '_slider');
@@ -138,13 +95,6 @@ function make_demographics_row(idx, name, enabled=true) {
 		number_b.value = parseFloat(val_b.toFixed(1));
 	});
 
-	// let slider_number_box = document.createElement('div');
-	// slider_number_box.classList.add('slider_number_box')
-
-	// slider_number_box.appendChild(slider);
-	// slider_number_box.appendChild(document.createElement('br'));
-	// slider_number_box.appendChild(number);
-
 	checkbox.addEventListener('change', (event) => { clear_all(); });
 
 	let td;
@@ -164,9 +114,7 @@ function make_demographics_row(idx, name, enabled=true) {
 	tr.appendChild(td);
 
 	td = document.createElement('td');
-	// td.appendChild(slider_number_box);
 	td.appendChild(slider);
-	// td.appendChild(number_b);
 	tr.appendChild(td);
 
 	td = document.createElement('td');
@@ -197,7 +145,6 @@ function make_demographics_row(idx, name, enabled=true) {
 function iterate_all_demographics(f) {
 	for (let idx = 0; idx < NUM_DEMOGRAPHICS; ++idx) {
 		let name = 'demographic_' + idx;
-
 		let checkbox = document.getElementById(name + '_enabled');
 		let enabled = undefined;
 		if (checkbox) {
@@ -208,7 +155,6 @@ function iterate_all_demographics(f) {
 }
 function iterate_all_enabled_demographics(f) {
 	iterate_all_demographics((idx, name, enabled) => {
-		// let enabled = document.getElementById(name + '_enabled').checked;
 		if (enabled) {
 			f(idx, name);
 		}
@@ -240,7 +186,7 @@ function reset_table() {
 
 	let tbody = document.getElementById('results_body');
 
-	// This can be slow when the table is very large
+	// This can be slow when the table is very large (TODO: would looping and removing one by one be faster?)
 	console.log('Clearing table...');
 	tbody.innerHTML = '';
 	console.log('Done clearing table');
@@ -257,11 +203,6 @@ function reset_stats() {
 	// console.log(demographics);
 
 	iterate_all_demographics((idx, name, enabled) => {
-	// 	document.getElementById(name + '_results_a').innerHTML = '';
-	// 	document.getElementById(name + '_results_b').innerHTML = '';
-	// });
-
-	// iterate_all_enabled_demographics((idx, name) => {
 		let label_a = document.getElementById(name + '_label_a').value;
 		let label_b = document.getElementById(name + '_label_b').value;
 
@@ -269,11 +210,11 @@ function reset_stats() {
 		let results_b = document.getElementById(name + '_results_b');
 
 		if (enabled) {
-			results_a.innerText = label_a + '\n0';
-			results_b.innerText = label_b + '\n0';
+			results_a.innerHTML = label_a + '<br>&nbsp;<br>&nbsp;';
+			results_b.innerHTML = label_b + '<br>&nbsp;<br>&nbsp;';
 		} else {
-			results_a.innerText = '';
-			results_b.innerText = '';
+			results_a.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
+			results_b.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
 		}
 	});
 }

@@ -141,15 +141,3 @@ table#individuals_results {
 	max-width: 250px;
 	margin: auto;
 }
-
-.label_number_box {
-	display: inline-block;
-	text-align: center;
-	margin: auto;
-}
-
-.slider_number_box {
-	display: inline-block;
-	text-align: center;
-	margin: auto;
-}
