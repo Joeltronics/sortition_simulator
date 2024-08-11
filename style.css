@@ -50,6 +50,11 @@ th {
 	flex-grow: 2;
 	min-width: 200px;
 	/* max-width: 250px; */
+
+	/* max-height: 100%; */
+	/* max-height: 500px; */
+
+	/* overflow: scroll; */
 }
 
 /* Population table */
@@ -83,28 +88,40 @@ th {
 
 table#individuals_results {
 	/* width: 100%; */
-	margin: auto;
+	/* margin: auto; */
+	margin-left: auto;
+	margin-right: auto;
+
+	/* height: 400px !important; */
+	/* max-height: 100%; */
+	/* max-height: 500px; */
+	/* height: 500px; */
 
 	/* max-height: 20em; */
 	/* max-height: 200px; */
-	/* overflow: scroll; */
+	overflow: scroll;
 }
-/* 
+
 #individuals_results thead {
-	display: block;
+	/* display: block; */
+	position: sticky;
+	top: 0;
+	background: white;
 }
-#individuals_results tr {
+/*#individuals_results tr {
 	display: table;
 } */
 
 #individuals_results tbody {
 	/* display: block; */
 	/* height: 100px; */
-	/* max-height: 100px; */
-	max-height: 20em;
+	/* max-height: 300px; */
+	/* height: 300px; */
+	/* max-height: 20em; */
 	/* overflow-x: hidden; */
 	/* overflow-y: auto; */
-	overflow: auto;
+	/* overflow: auto; */
+	overflow: scroll;
 }
 
 /* #individuals_results tr {} */
