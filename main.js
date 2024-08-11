@@ -210,8 +210,10 @@ function reset_stats() {
 		let results_b = document.getElementById(name + '_results_b');
 
 		if (enabled) {
-			results_a.innerHTML = label_a + '<br>&nbsp;<br>&nbsp;';
-			results_b.innerHTML = label_b + '<br>&nbsp;<br>&nbsp;';
+			results_a.innerText = label_a;
+			results_a.innerHTML += '<br>&nbsp;<br>&nbsp;';
+			results_b.innerText = label_b;
+			results_b.innerHTML += '<br>&nbsp;<br>&nbsp;';
 		} else {
 			results_a.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
 			results_b.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
