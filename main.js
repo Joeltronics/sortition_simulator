@@ -97,31 +97,19 @@ function make_demographics_row(idx, name, enabled=true) {
 
 	checkbox.addEventListener('change', (event) => { clear_all(); });
 
+	[
+		[checkbox],
+		[text_category],
+		[text_a, document.createElement('br'), number_a],
+		[slider],
+		[text_b, document.createElement('br'), number_b],
+	].forEach((cell) => {
+		let td = document.createElement('td');
+		cell.forEach((elem) => { td.appendChild(elem);});
+		tr.appendChild(td);
+	});
+
 	let td;
-
-	td = document.createElement('td');
-	td.appendChild(checkbox);
-	tr.appendChild(td);
-
-	td = document.createElement('td');
-	td.appendChild(text_category);
-	tr.appendChild(td);
-
-	td = document.createElement('td');
-	td.appendChild(text_a);
-	td.appendChild(document.createElement('br'));
-	td.appendChild(number_a);
-	tr.appendChild(td);
-
-	td = document.createElement('td');
-	td.appendChild(slider);
-	tr.appendChild(td);
-
-	td = document.createElement('td');
-	td.appendChild(text_b);
-	td.appendChild(document.createElement('br'));
-	td.appendChild(number_b);
-	tr.appendChild(td);
 
 	td = document.createElement('td');
 	td.id = name + '_results_a';
@@ -261,17 +249,17 @@ function _pick_one()
 	}
 
 	iterate_all_enabled_demographics((idx, name) => {
-		let probability_a = document.getElementById(name + '_probability_a').value / 100.0;
-		// let probability_b = document.getElementById(name + '_probability_b').value / 100.0;
+		const probability_a = document.getElementById(name + '_probability_a').value / 100.0;
+		// const probability_b = document.getElementById(name + '_probability_b').value / 100.0;
 
-		let label_a = document.getElementById(name + '_label_a').value;
-		let label_b = document.getElementById(name + '_label_b').value;
+		const label_a = document.getElementById(name + '_label_a').value;
+		const label_b = document.getElementById(name + '_label_b').value;
 		let results_a = document.getElementById(name + '_results_a');
 		let results_b = document.getElementById(name + '_results_b');
 
 		let selected_idx;
 		let selected_label;
-		let r = Math.random();
+		const r = Math.random();
 		if (r < probability_a) {
 			selected_label = label_a;
 			selected_idx = 0;
@@ -282,18 +270,17 @@ function _pick_one()
 
 		demographics[idx][selected_idx] += 1;
 
-
 		if (tr) {
 			let td = document.createElement('td');
 			td.innerText = selected_label;
 			tr.appendChild(td);
 		}
 
-		let val_a = demographics[idx][0];
-		let val_b = demographics[idx][1];
+		const val_a = demographics[idx][0];
+		const val_b = demographics[idx][1];
 
-		let pct_a = val_a / num_people * 100.0;
-		let pct_b = val_b / num_people * 100.0;
+		const pct_a = val_a / num_people * 100.0;
+		const pct_b = val_b / num_people * 100.0;
 
 		results_a.innerText = `${label_a}\n${val_a} / ${num_people}\n${pct_a.toFixed(1)} %`;
 		results_b.innerText = `${label_b}\n${val_b} / ${num_people}\n${pct_b.toFixed(1)} %`;
