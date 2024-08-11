@@ -1,0 +1,155 @@
+/* Debug borders */
+
+/* div { border: 1px solid black; }
+tr { border: 1px solid black; }
+th { border: 1px solid black; }
+td { border: 1px solid black; } */
+
+/* General */
+
+body {
+	font-family: Helvetica, Arial, sans-serif;
+}
+
+.inline_block {
+	display: inline-block;
+}
+
+.inline_block_center {
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+}
+
+th {
+	border-bottom: 1px solid black;
+}
+
+/* Main containers */
+
+#outer_container {
+	margin: auto;
+	max-width: 1250px;
+}
+
+#flex_container {
+	display: flex;
+	/* flex-wrap: auto; */
+	flex-wrap: wrap;
+	justify-content: space-between;
+}
+
+
+#demographics_container {
+	flex-grow: 0;
+	min-width: 200px;
+	max-width: 1000px;
+}
+
+#individuals_container {
+	flex-grow: 2;
+	min-width: 200px;
+	/* max-width: 250px; */
+}
+
+/* Population table */
+
+/* #demographics_container tr { */
+	/* border: 1px solid black; */
+/* } */
+
+/* #demographics_container tbody tr:nth-child(odd) {
+	background-color: #EEE;
+} */
+
+#demographics_container td {
+	text-align: center;
+	margin: auto;
+
+	padding-left: 0.25em;
+	padding-right: 0.25em;
+
+	/* border-top: 1px solid black; */
+}
+
+#demographics_container td.result_cell {
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}
+
+/* Results Table */
+
+/* TODO: get tbody scrollbar working */
+
+table#individuals_results {
+	/* width: 100%; */
+	margin: auto;
+
+	/* max-height: 20em; */
+	/* max-height: 200px; */
+	/* overflow: scroll; */
+}
+/* 
+#individuals_results thead {
+	display: block;
+}
+#individuals_results tr {
+	display: table;
+} */
+
+#individuals_results tbody {
+	/* display: block; */
+	/* height: 100px; */
+	/* max-height: 100px; */
+	max-height: 20em;
+	/* overflow-x: hidden; */
+	/* overflow-y: auto; */
+	overflow: auto;
+}
+
+/* #individuals_results tr {} */
+
+#individuals_results th {
+	/* min-width: 100px; */
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+#individuals_results td {
+	text-align: center;
+}
+
+#individuals_results tbody tr:nth-child(odd) {
+	background-color: #DDD;
+}
+
+/* Other Specifics */
+
+.demographic_row {
+	display: flex;
+	/* flex-direction: column;*/
+	align-items: center;
+	/* justify-content: center;*/
+}
+
+#pick_buttons {
+	display: flex;
+	/* flex-direction: column;*/
+	align-items: center;
+	/* justify-content: center;*/
+
+	max-width: 250px;
+	margin: auto;
+}
+
+.label_number_box {
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+}
+
+.slider_number_box {
+	display: inline-block;
+	text-align: center;
+	margin: auto;
+}
