@@ -298,14 +298,6 @@ function reset_stats() {
 	update_stats();
 }
 
-function on_ready() {
-	iterate_all_demographics((idx, name, num_categories, enabled) => {
-		make_demographics_row(idx, name, num_categories, idx <= 1);
-	});
-	reset_stats();
-	reset_table();
-}
-
 function pick_one() {
 	pick(1);
 }
@@ -406,4 +398,10 @@ function clear_all() {
 	reset_table();
 }
 
-$( document ).ready(on_ready);
+function main() {
+	iterate_all_demographics((idx, name, num_categories, enabled) => {
+		make_demographics_row(idx, name, num_categories, idx <= 1);
+	});
+	reset_stats();
+	reset_table();
+}
