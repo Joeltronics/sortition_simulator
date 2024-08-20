@@ -262,9 +262,13 @@ function update_stats() {
 
 			let this_category_enabled = enabled;
 			if (enabled && num_categories > 2) {
-				const probability = parseFloat(document.getElementById(name + '_probability_' + i).value);
-				if (is_empty_or_whitespace(label) && probability <= 0) {
+				const probability = parseFloat(document.getElementById(name + '_probability_' + i).value) || 0;
+				const empty = is_empty_or_whitespace(label);
+				if (empty && probability <= 0) {
+					console.debug(`Category ${name} ${i} is not enabled`);
 					this_category_enabled = false;
+				} else if (empty) {
+					console.debug(`Category ${name} ${i} is empty, but probability is not <= 0`);
 				}
 			}
 
