@@ -25,6 +25,12 @@ th {
 	border-bottom: 1px solid black;
 }
 
+input:invalid, input.is_invalid {
+	border: none;
+	outline: 2px solid red;
+	border-radius: 5px;
+}
+
 /* Main containers */
 
 #outer_container {

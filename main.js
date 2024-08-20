@@ -85,19 +85,24 @@ function set_callbacks(category_probability_inputs, slider=null) {
 					sum_non_other += parseFloat(category_probability_inputs[n].value);
 				}
 
-				// const other_val = Math.max(0, 100 - sum_non_other);
 				const other_val = 100 - sum_non_other;
-				// TODO: better overflow handling (when other_val < 0)
 
 				for (let n = 0; n < category_probability_inputs.length - 1; ++n) {
 					let input_n = category_probability_inputs[n];
-					const max_val = parseFloat(input_n.value) + Math.max(0, other_val);
+					const max_val = parseFloat(input_n.value) + other_val;
 					input_n.setAttribute('max', max_val.toFixed(1));
 				}
 
 				console.log('sum_non_other', sum_non_other, 'other_val', other_val);
 
-				other_box.value = parseFloat(other_val.toFixed(1))
+				other_box.value = parseFloat(other_val.toFixed(1));
+
+				// "readonly" inputs don't seem to get ":invalid" pseudo-class, so add it a custom class
+				if (other_val < 0) {
+					other_box.classList.add('is_invalid');
+				} else {
+					other_box.classList.remove('is_invalid');
+				}
 			});
 		}
 	}
@@ -321,6 +326,7 @@ function _pick_one()
 	let tbody = document.getElementById('results_body');
 
 	// Only show up to 1000 people - it gets too slow otherwise
+	// TODO: add "..." to row 1001
 	let tr;
 	if (num_people <= 1000) {
 		tr = document.createElement('tr');
@@ -332,13 +338,12 @@ function _pick_one()
 
 	iterate_all_enabled_demographics((idx, name, num_categories) => {
 
-		let selected_idx;
+		const r = Math.random();
+
+		let selected_idx = -1;
 		if (num_categories == 2)
 		{
 			const probability_a = document.getElementById(name + '_probability_0').value / 100.0;
-			// const probability_b = document.getElementById(name + '_probability_1').value / 100.0;
-
-			const r = Math.random();
 			if (r < probability_a) {
 				selected_idx = 0;
 			} else {
@@ -347,13 +352,6 @@ function _pick_one()
 		}
 		else
 		{
-			const r = Math.random();
-
-
-
-
-			// TODO
-
 			let sum_prob = 0;
 			for (let i = 0; i < num_categories; ++i) {
 				const probability_this_category = Math.max(0, document.getElementById(name + '_probability_' + i).value / 100.0);
@@ -364,21 +362,14 @@ function _pick_one()
 					break;
 				}
 			}
-
-
-
-
-
-			// const probability_a = document.getElementById(name + '_probability_0').value / 100.0;
-			// const probability_b = document.getElementById(name + '_probability_1').value / 100.0;
-
-			
-
-			// selected_idx = 0;
-			// selected_label = '';
 		}
 
-		demographics[idx][selected_idx] += 1;
+		if (selected_idx < 0) {
+			console.warn('Failed to select! r=' + r);
+		}
+		else {
+			demographics[idx][selected_idx] += 1;
+		}
 
 		if (tr) {
 			let td = document.createElement('td');
