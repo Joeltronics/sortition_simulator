@@ -6,6 +6,11 @@ const MAX_NUM_CATEGORIES = 5;
 var demographics = [];
 var num_people = 0;
 
+function round_01(val) {
+	// Round to 0.1, but remove trailing ".0"
+	return parseFloat(parseFloat(val).toFixed(1));
+}
+
 function is_empty_or_whitespace(str) {
 	return str === null || str.match(/^ *$/) !== null;
 }
@@ -65,9 +70,8 @@ function set_callbacks(category_probability_inputs, slider=null) {
 			slider.addEventListener('change', (event) => {
 				let val_a = parseFloat(slider.value);
 				let val_b = 100 - val_a;
-				// Round to 0.1, but remove trailing ".0"
-				number_a.value = parseFloat(val_a.toFixed(1));
-				number_b.value = parseFloat(val_b.toFixed(1));
+				number_a.value = round_01(val_a);
+				number_b.value = round_01(val_b);
 			});
 		}
 	} else {
@@ -82,7 +86,7 @@ function set_callbacks(category_probability_inputs, slider=null) {
 
 				let sum_non_other = 0;
 				for (let n = 0; n < category_probability_inputs.length - 1; ++n) {
-					sum_non_other += parseFloat(category_probability_inputs[n].value);
+					sum_non_other += parseFloat(category_probability_inputs[n].value || 0);
 				}
 
 				const other_val = 100 - sum_non_other;
@@ -93,11 +97,11 @@ function set_callbacks(category_probability_inputs, slider=null) {
 					input_n.setAttribute('max', max_val.toFixed(1));
 				}
 
-				console.log('sum_non_other', sum_non_other, 'other_val', other_val);
+				console.debug('sum of non-other', sum_non_other, 'other', other_val);
 
-				other_box.value = parseFloat(other_val.toFixed(1));
+				other_box.value = round_01(other_val);
 
-				// "readonly" inputs don't seem to get ":invalid" pseudo-class, so add it a custom class
+				// "readonly" inputs don't seem to get ":invalid" pseudo-class, so add it as a custom class
 				if (other_val < 0) {
 					other_box.classList.add('is_invalid');
 				} else {
@@ -189,11 +193,6 @@ function make_demographics_row(idx, name, num_categories, enabled=true) {
 		td.classList.add('result_cell');
 		tr.appendChild(td);
 	}
-
-	// TODO: pie chart
-	// td = document.createElement('td');
-	// td.id = name + '_pie_chart';
-	// td.appendChild(td);
 
 	let dem = document.getElementById("demographics_body");
 	dem.appendChild(tr);
@@ -298,7 +297,6 @@ function reset_stats() {
 		}
 		demographics.push(dem);
 	});
-	// console.log(demographics);
 
 	update_stats();
 }
