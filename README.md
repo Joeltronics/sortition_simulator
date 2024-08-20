@@ -1,1 +1,1 @@
-# sortition_simulator
+# Sortition Simulator
