@@ -247,7 +247,7 @@ function reset_table() {
 
 	let tbody = document.getElementById('results_body');
 
-	// This can be slow when the table is very large (TODO: would looping and removing one by one be faster?)
+	// This can be slow when the table is very large, but now we only show up to 1000 people so it's not so bad
 	console.log('Clearing table...');
 	tbody.innerHTML = '';
 	console.log('Done clearing table');
@@ -326,13 +326,13 @@ function _pick_one()
 	let tbody = document.getElementById('results_body');
 
 	// Only show up to 1000 people - it gets too slow otherwise
-	// TODO: add "..." to row 1001
 	let tr;
-	if (num_people <= 1000) {
+	const is_ellipsis_row = num_people == 1001;
+	if (num_people <= 1001) {
 		tr = document.createElement('tr');
 
 		let td = document.createElement('td');
-		td.innerText = num_people;
+		td.innerText = is_ellipsis_row ? '...' : num_people;
 		tr.appendChild(td);
 	}
 
@@ -373,7 +373,9 @@ function _pick_one()
 
 		if (tr) {
 			let td = document.createElement('td');
-			td.innerText = document.getElementById(name + '_label_' + selected_idx).value;
+			if (!is_ellipsis_row) {
+				td.innerText = document.getElementById(name + '_label_' + selected_idx).value;
+			}
 			tr.appendChild(td);
 		}
 	});
