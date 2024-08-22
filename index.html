@@ -9,6 +9,8 @@
 		<div id="outer_container">
 			<h1>Sortition Simulator</h1>
 
+			<div id="flex_container">
+
 				<div id="demographics_container">
 					<h2>Overall</h2>
 					<table id="demographics">
@@ -27,7 +29,9 @@
 					<div id="pick_buttons">
 						<input type="button" value="Pick One" onclick="pick_one()"/>
 						<div class="inline_block_center">
-							<input type="button" value="Pick Many" onclick="pick_many()"/><br/>
+							<input type="button" value="Clear & Pick" onclick="clear_and_pick_many()"/>
+							<input type="button" value="Pick More" onclick="pick_many()"/>
+							<br/>
 							<input type="number" id="pick_many_number" name="pick_many_number" value="100" step="1" min="1"/>
 						</div>
 						<input type="button" value="Clear" onclick="clear_all()"/>
@@ -37,6 +41,8 @@
 						<tbody id="results_body"></tbody>
 					</table>
 				</div> <!-- individuals_container -->
+
+			</div> <!-- flex_container -->
 		</div> <!-- outer_container -->
 		<script>
 			main();

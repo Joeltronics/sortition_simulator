@@ -1,5 +1,10 @@
 /* General */
 
+h1 {
+	margin: auto;
+	text-align: center;
+}
+
 body {
 	font-family: Helvetica, Arial, sans-serif;
 }
@@ -18,6 +23,18 @@ th {
 	border-bottom: 1px solid black;
 }
 
+.percentage {
+	font-weight: bold;
+}
+
+.fraction {
+	font-size: 0.85em;
+}
+
+.category_name {
+	width: 4em;
+}
+
 /* "readonly" inputs don't seem to get ":invalid" pseudo-class, so add custom "is_invalid" class too */
 input:invalid, input.is_invalid {
 	border: none;
@@ -29,7 +46,12 @@ input:invalid, input.is_invalid {
 
 #outer_container {
 	margin: auto;
-	max-width: 1250px;
+}
+
+#flex_container {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
 }
 
 #demographics_container {
@@ -54,6 +76,7 @@ input:invalid, input.is_invalid {
 #demographics_container td.result_cell {
 	padding-left: 0.5em;
 	padding-right: 0.5em;
+	min-width: 64px;
 }
 
 /* Results Table */
@@ -61,6 +84,7 @@ input:invalid, input.is_invalid {
 table#individuals_results {
 	margin-left: auto;
 	margin-right: auto;
+	margin-bottom: 5em;
 }
 
 #individuals_results thead {

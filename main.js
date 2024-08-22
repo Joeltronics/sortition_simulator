@@ -144,6 +144,7 @@ function make_demographics_row(idx, name, num_categories, enabled=true) {
 		text.setAttribute('value', default_category_name);
 		text.setAttribute('name', name + '_label_' + i);
 		text.setAttribute('id', name + '_label_' + i);
+		text.classList.add('category_name');
 		text.addEventListener('change', (event) => { update_stats(); });
 		category_text_boxes.push(text);
 
@@ -273,17 +274,22 @@ function update_stats() {
 			}
 
 			if (!this_category_enabled) {
-				results.innerHTML = '&nbsp;<br>&nbsp;<br>&nbsp;';
-
-			} else if (num_people <= 0) {
-				// Prevent injection - update as text, then append HTML
-				results.innerText = label;
-				results.innerHTML += '<br>&nbsp;<br>&nbsp;';	
+				results.classList.remove('result_cell');
+				results.innerText = '';
 
 			} else {
-				const val = demographics[idx][i];
-				const pct = val / num_people * 100.0;
-				results.innerText = `${label}\n${val} / ${num_people}\n${pct.toFixed(1)} %`;
+				results.classList.add('result_cell');
+				if (num_people <= 0) {
+					// Prevent injection - update as text, then append HTML
+					results.innerText = label;
+					results.innerHTML += '<br>&nbsp;<br>&nbsp;';
+
+				} else {
+					const val = demographics[idx][i];
+					const pct = val / num_people * 100.0;
+					results.innerText = `${label}\n`;
+					results.innerHTML += `<span class="fraction">${val} / ${num_people}</span><br><span class="percentage">${pct.toFixed(1)} %</span>`
+				}
 			}
 		}
 	});
@@ -310,6 +316,11 @@ function pick_one() {
 }
 
 function pick_many() {
+	pick(document.getElementById("pick_many_number").value);
+}
+
+function clear_and_pick_many() {
+	clear_all();
 	pick(document.getElementById("pick_many_number").value);
 }
 
